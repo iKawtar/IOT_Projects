@@ -1,0 +1,437 @@
+[
+    {
+        "id": "606bad7064a4df2b",
+        "type": "tab",
+        "label": "Motor Diagnostics",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "82be40b0a275d0b1",
+        "type": "ui_numeric",
+        "z": "606bad7064a4df2b",
+        "name": "Num Temp",
+        "label": "Stator Temp (°C):",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": false,
+        "topic": "temp",
+        "topicType": "str",
+        "format": "{{value}} °C",
+        "min": 20,
+        "max": 150,
+        "step": 1,
+        "className": "",
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "3ac2425b22ce68e4",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "3ac2425b22ce68e4",
+        "type": "ui_slider",
+        "z": "606bad7064a4df2b",
+        "name": "Slider Temp",
+        "label": "",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "temp",
+        "topicType": "str",
+        "min": 20,
+        "max": 150,
+        "step": 1,
+        "className": "",
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "82be40b0a275d0b1",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "dc285ce13f7b17f8",
+        "type": "ui_numeric",
+        "z": "606bad7064a4df2b",
+        "name": "Num Vib",
+        "label": "Bearing Vib (Hz):",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": false,
+        "topic": "vib",
+        "topicType": "str",
+        "format": "{{value}} Hz",
+        "min": 0,
+        "max": 500,
+        "step": 1,
+        "className": "",
+        "x": 160,
+        "y": 200,
+        "wires": [
+            [
+                "b75ff0562cc805e8",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "b75ff0562cc805e8",
+        "type": "ui_slider",
+        "z": "606bad7064a4df2b",
+        "name": "Slider Vib",
+        "label": "",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "vib",
+        "topicType": "str",
+        "min": 0,
+        "max": 500,
+        "step": 1,
+        "className": "",
+        "x": 160,
+        "y": 240,
+        "wires": [
+            [
+                "dc285ce13f7b17f8",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "8921227110a5b335",
+        "type": "ui_numeric",
+        "z": "606bad7064a4df2b",
+        "name": "Num Curr",
+        "label": "Load Current (A):",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": false,
+        "topic": "curr",
+        "topicType": "str",
+        "format": "{{value}} A",
+        "min": 5,
+        "max": 100,
+        "step": 0.5,
+        "className": "",
+        "x": 160,
+        "y": 300,
+        "wires": [
+            [
+                "2423ca0d6079c001",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "2423ca0d6079c001",
+        "type": "ui_slider",
+        "z": "606bad7064a4df2b",
+        "name": "Slider Curr",
+        "label": "",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "curr",
+        "topicType": "str",
+        "min": 5,
+        "max": 100,
+        "step": 0.5,
+        "className": "",
+        "x": 160,
+        "y": 340,
+        "wires": [
+            [
+                "8921227110a5b335",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "d1260270eb2c99e4",
+        "type": "ui_numeric",
+        "z": "606bad7064a4df2b",
+        "name": "Num Age",
+        "label": "Runtime (Hrs):",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "wrap": false,
+        "passthru": false,
+        "topic": "age",
+        "topicType": "str",
+        "format": "{{value}} Hrs",
+        "min": 0,
+        "max": 50000,
+        "step": 100,
+        "className": "",
+        "x": 160,
+        "y": 400,
+        "wires": [
+            [
+                "c002f18755b068b9",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "c002f18755b068b9",
+        "type": "ui_slider",
+        "z": "606bad7064a4df2b",
+        "name": "Slider Age",
+        "label": "",
+        "tooltip": "",
+        "group": "ui_group_adv_sensors",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "age",
+        "topicType": "str",
+        "min": 0,
+        "max": 50000,
+        "step": 100,
+        "className": "",
+        "x": 160,
+        "y": 440,
+        "wires": [
+            [
+                "d1260270eb2c99e4",
+                "d3df49b444789917"
+            ]
+        ]
+    },
+    {
+        "id": "d3df49b444789917",
+        "type": "function",
+        "z": "606bad7064a4df2b",
+        "name": "Construct 4D Feature Tensor",
+        "func": "// Save incoming data to flow context\nlet topic = msg.topic;\nflow.set(topic, Number(msg.payload));\n\n// Retrieve all state (default to healthy baselines)\nlet temp = flow.get('temp') || 40;\nlet vib = flow.get('vib') || 20;\nlet curr = flow.get('curr') || 15;\nlet age = flow.get('age') || 1000;\n\n// Construct the input tensor array [x1, x2, x3, x4]\nmsg.payload = [temp, vib, curr, age];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 260,
+        "wires": [
+            [
+                "5514c8cc42c29c0f"
+            ]
+        ]
+    },
+    {
+        "id": "5514c8cc42c29c0f",
+        "type": "function",
+        "z": "606bad7064a4df2b",
+        "name": "Neural Net Predict (Mockup)",
+        "func": "let features = msg.payload; // [temp, vib, curr, age]\nlet temp = features[0];\nlet vib = features[1];\nlet curr = features[2];\nlet age = features[3];\n\n// Simulate non-linear feature interactions\nlet p_temp = Math.pow((temp / 150), 2) * 45;\nlet p_vib = Math.pow((vib / 500), 2) * 35;\nlet p_curr = Math.pow((curr / 100), 1.5) * 15;\nlet p_age = (age / 50000) * 10;\n\nlet health = 100 - (p_temp + p_vib + p_curr + p_age);\nhealth = Math.max(0.1, Math.min(100, health));\n\nlet rul = Math.round((health / 100) * 10000);\n\nlet color = \"#00e676\"; // Green\nlet status = \"OPTIMAL\";\nif (health < 40) {\n    color = \"#ff1744\";\n    status = \"CRITICAL FAILURE IMMINENT\";\n} else if (health < 75) {\n    color = \"#ff9100\";\n    status = \"MAINTENANCE REQUIRED\";\n}\n\nmsg.health = parseFloat(health.toFixed(2));\nmsg.rul = rul;\nmsg.color = color;\nmsg.status = status;\n\nreturn [\n    { payload: msg.health },\n    { payload: msg.rul },\n    { payload: msg.status, color: msg.color }\n];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 260,
+        "wires": [
+            [
+                "6bd50f447db367cb",
+                "6d0bcde327228925"
+            ],
+            [
+                "656bdf82a1f0a129"
+            ],
+            [
+                "347f065beaada49b"
+            ]
+        ]
+    },
+    {
+        "id": "6bd50f447db367cb",
+        "type": "ui_gauge",
+        "z": "606bad7064a4df2b",
+        "name": "Overall Health %",
+        "group": "ui_group_adv_ai",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Machine Health Score",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#ff1744",
+            "#ff9100",
+            "#00e676"
+        ],
+        "seg1": "40",
+        "seg2": "75",
+        "className": "",
+        "x": 1100,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "656bdf82a1f0a129",
+        "type": "ui_text",
+        "z": "606bad7064a4df2b",
+        "group": "ui_group_adv_ai",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "RUL Prediction",
+        "label": "Predicted Remaining Useful Life (RUL):",
+        "format": "<h2>{{msg.payload}} Hours</h2>",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1100,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "347f065beaada49b",
+        "type": "ui_text",
+        "z": "606bad7064a4df2b",
+        "group": "ui_group_adv_ai",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Status Alert",
+        "label": "AI Recommendation:",
+        "format": "<font color=\"{{msg.color}}\"><b>{{msg.payload}}</b></font>",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1090,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "6d0bcde327228925",
+        "type": "ui_chart",
+        "z": "606bad7064a4df2b",
+        "name": "Health Trend Over Time",
+        "group": "ui_group_adv_chart",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "Real-time Health Degradation",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "5",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1130,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ui_group_adv_sensors",
+        "type": "ui_group",
+        "name": "Live Telemetry Controls",
+        "tab": "ui_tab_adv_motor",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui_group_adv_ai",
+        "type": "ui_group",
+        "name": "AI Model Outputs",
+        "tab": "ui_tab_adv_motor",
+        "order": 2,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui_group_adv_chart",
+        "type": "ui_group",
+        "name": "Health Degradation Trend",
+        "tab": "ui_tab_adv_motor",
+        "order": 3,
+        "disp": true,
+        "width": "20",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui_tab_adv_motor",
+        "type": "ui_tab",
+        "name": "Factory Floor: Motor 01",
+        "icon": "fa-cogs",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "305f5e4eafbf31cc",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]

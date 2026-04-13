@@ -1,0 +1,1159 @@
+[
+    {
+        "id": "f4a08ca0aee592f2",
+        "type": "tab",
+        "label": "Stadium",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "fb484b2eb41a71b2",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "State Init",
+        "func": "const stadiumState = {\n    alerts: {},\n    attendance: {\n        zone1: { current: 1150, capacity: 4000 },\n        zone2: { current: 3990, capacity: 7000 },\n        zone3: { current: 590, capacity: 3000 },\n        zone4: { current: 5910, capacity: 6000 },\n        global: 0,\n        globalCapacity: 4000 + 7000 + 3000 + 6000,\n    },\n    lighting: {\n        zone1: 100, zone2: 100, zone3: 100, zone4: 100\n    },\n    environment: {\n        co2: 420, aqi: 25, temp: 24.5\n    },\n    power: {\n        gridKW: 1800,\n        gridVoltage: 230,\n        gen1: { status: 'STANDBY', rpm: 0 },\n        gen2: { status: 'ACTIF', rpm: 0 },\n        gen3: { status: 'PANNE' }\n    }\n};\n\nglobal.set('stadiumState', stadiumState);\nmsg.payload = stadiumState;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "231f008582bc01a2",
+        "type": "inject",
+        "z": "f4a08ca0aee592f2",
+        "name": "Every 2s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 500,
+        "wires": [
+            [
+                "2039f575839832f1"
+            ]
+        ]
+    },
+    {
+        "id": "17939e7c54d31b98",
+        "type": "inject",
+        "z": "f4a08ca0aee592f2",
+        "name": "Init",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "fb484b2eb41a71b2"
+            ]
+        ]
+    },
+    {
+        "id": "2039f575839832f1",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Engine",
+        "func": "let state = global.get('stadiumState');\n\n// Ensure the alerts object exists\nif (!state.alerts) {\n    state.alerts = {};\n}\n\n// 1. Simulate Attendance (Increment until capacity)\n['zone1', 'zone2', 'zone3', 'zone4'].forEach(zone => {\n    if (state.attendance[zone].current < state.attendance[zone].capacity) {\n        state.attendance[zone].current += Math.floor(Math.random() * 20);\n        \n        // Cap it exactly at capacity\n        if (state.attendance[zone].current > state.attendance[zone].capacity) {\n            state.attendance[zone].current = state.attendance[zone].capacity;\n        }\n    }\n});\n\n// Calculate Global Attendance\nstate.attendance.global = state.attendance.zone1.current + state.attendance.zone2.current + state.attendance.zone3.current + state.attendance.zone4.current;\n\n// 2. Simulate Environment\nstate.environment.co2 += (Math.random() - 0.4) * 5; \nstate.environment.temp += (Math.random() - 0.5) * 0.2;\n\n// 3. Simulate Power (Simple fluctuations for charting)\nstate.power.gridKW += (Math.random() - 0.5) * 40;\nstate.power.gridKW = Math.max(1000, Math.min(2500, state.power.gridKW));\nstate.power.gridVoltage = 230 + (Math.random() - 0.5) * 4;\n\n['gen1', 'gen2', 'gen3'].forEach(gen => {\n    if (state.power[gen]) {\n        if (state.power[gen].status === 'ACTIF') {\n            // If active, fluctuate RPM around 1500\n            state.power[gen].rpm = 1500 + Math.floor((Math.random() - 0.5) * 50);\n        } else {\n            // If STANDBY or PANNE, RPM is 0\n            state.power[gen].rpm = 0;\n        }\n    }\n});\n\n// 4. Log Alerts to the State Object\n// A. Dynamic Zone Attendance Alerts\n['zone1', 'zone2', 'zone3', 'zone4'].forEach(zone => {\n    if (state.attendance[zone].current >= state.attendance[zone].capacity) {\n        let alertId = `capacity.${zone}`;\n        if (!state.alerts[alertId]) {\n            state.alerts[alertId] = { \n                msg: `CRITICAL: ${zone.toUpperCase()} at 100% Capacity!`, \n                treated: false,\n                shown: false,\n                type: 'security'\n            };\n        }\n    }\n});\n\n// B. Grid Overload Warning\nif (state.power.gridKW > 2200) {\n    if (!state.alerts['power.grid_warning']) {\n        state.alerts['power.grid_warning'] = {\n            msg: `WARNING: Grid load high (${Math.round(state.power.gridKW)} kW)`,\n            treated: false,\n            shown: false,\n            type: 'power'\n        };\n    }\n}\n\n// C. Generator Failure Alerts\n['gen1', 'gen2', 'gen3'].forEach(gen => {\n    if (state.power[gen].status === 'PANNE') {\n        let alertId = `power.${gen}_failure`;\n        if (!state.alerts[alertId]) {\n            state.alerts[alertId] = { \n                msg: `URGENT: ${gen.toUpperCase()} is in PANNE state. Intervention required.`, \n                treated: false,\n                shown: false,\n                type: 'power'\n            };\n        }\n    }\n});\n\n// Save back to global memory\nglobal.set('stadiumState', state);\n\n// 5. Output Routing (Splitting logic)\nreturn [\n    { payload: state.attendance },  // Pin 1: Attendance\n    { payload: state.lighting },    // Pin 2: Lighting\n    { payload: state.environment }, // Pin 3: HVAC\n    { payload: state.power },       // Pin 4: Power\n    { payload: state.alerts }       // Pin 5: Alerts\n];",
+        "outputs": 5,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 500,
+        "wires": [
+            [
+                "897fbbec35a879b9",
+                "9c0438c53ca18db0"
+            ],
+            [
+                "8fd8bdd38f0a3419"
+            ],
+            [
+                "a8493602efd0ed1f",
+                "791cf963a38e5828"
+            ],
+            [
+                "39e7838f214daa94",
+                "770aca6d1dca4f4f",
+                "63826227c536cbc2"
+            ],
+            [
+                "ba5d932c1cc6c26e"
+            ]
+        ]
+    },
+    {
+        "id": "7bf30c7b0216127f",
+        "type": "ui_gauge",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "group": "7cac6c09222056b3",
+        "order": 2,
+        "width": "4",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Zone 1",
+        "label": "seats",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "4000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "897fbbec35a879b9",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Split Zones Attendance",
+        "func": "return [\n    { payload: msg.payload.zone1.current },\n    { payload: msg.payload.zone2.current },\n    { payload: msg.payload.zone3.current },\n    { payload: msg.payload.zone4.current },\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 260,
+        "wires": [
+            [
+                "7bf30c7b0216127f"
+            ],
+            [
+                "a34fcd69ec5aa463"
+            ],
+            [
+                "ac287a1784ddaf50"
+            ],
+            [
+                "025dcf6098b772c9"
+            ]
+        ]
+    },
+    {
+        "id": "9c0438c53ca18db0",
+        "type": "ui_text",
+        "z": "f4a08ca0aee592f2",
+        "group": "7cac6c09222056b3",
+        "order": 1,
+        "width": "8",
+        "height": "2",
+        "name": "",
+        "label": "Total Stadium Attendance",
+        "format": "{{msg.payload.global}} / {{msg.payload.globalCapacity}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": true,
+        "font": "",
+        "fontSize": "16",
+        "color": "#000000",
+        "x": 870,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "a34fcd69ec5aa463",
+        "type": "ui_gauge",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "group": "7cac6c09222056b3",
+        "order": 3,
+        "width": "4",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Zone 2",
+        "label": "seats",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "7000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "ac287a1784ddaf50",
+        "type": "ui_gauge",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "group": "7cac6c09222056b3",
+        "order": 4,
+        "width": "4",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Zone 3",
+        "label": "seats",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "3000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "025dcf6098b772c9",
+        "type": "ui_gauge",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "group": "7cac6c09222056b3",
+        "order": 5,
+        "width": "4",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Zone 4",
+        "label": "seats",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "6000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 860,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "4065e88f9fbb5d5a",
+        "type": "ui_slider",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "label": "Zone 1 Brightness",
+        "tooltip": "",
+        "group": "b5a39d4e0df1513c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 1090,
+        "y": 380,
+        "wires": [
+            [
+                "eb83bbb8cacb5352"
+            ]
+        ]
+    },
+    {
+        "id": "eb83bbb8cacb5352",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Update Lighting Zone 1",
+        "func": "let state = global.get('stadiumState');\nstate.lighting.zone1 = msg.payload;\nglobal.set('stadiumState', state);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "76656b3605e86196",
+        "type": "ui_slider",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "label": "Zone 2 Brightness",
+        "tooltip": "",
+        "group": "b5a39d4e0df1513c",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 1090,
+        "y": 420,
+        "wires": [
+            [
+                "335ff1ebfe1cc923"
+            ]
+        ]
+    },
+    {
+        "id": "335ff1ebfe1cc923",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Update Lighting Zone 2",
+        "func": "let state = global.get('stadiumState');\nstate.lighting.zone2 = msg.payload;\nglobal.set('stadiumState', state);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "07dad0cd38c3d02d",
+        "type": "ui_slider",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "label": "Zone 3 Brightness",
+        "tooltip": "",
+        "group": "b5a39d4e0df1513c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 1090,
+        "y": 460,
+        "wires": [
+            [
+                "3af943c536214681"
+            ]
+        ]
+    },
+    {
+        "id": "3af943c536214681",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Update Lighting Zone 3",
+        "func": "let state = global.get('stadiumState');\nstate.lighting.zone3 = msg.payload;\nglobal.set('stadiumState', state);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9b4cda9480cf8461",
+        "type": "ui_slider",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "label": "Zone 4 Brightness",
+        "tooltip": "",
+        "group": "b5a39d4e0df1513c",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "all",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "className": "",
+        "x": 1090,
+        "y": 500,
+        "wires": [
+            [
+                "919666f6d4f0d8bb"
+            ]
+        ]
+    },
+    {
+        "id": "919666f6d4f0d8bb",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Update Lighting Zone 4",
+        "func": "let state = global.get('stadiumState');\nstate.lighting.zone4 = msg.payload;\nglobal.set('stadiumState', state);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7ca0f345dcf9c350",
+        "type": "ui_gauge",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "group": "303af5db77018210",
+        "order": 0,
+        "width": "8",
+        "height": "4",
+        "gtype": "gage",
+        "title": "CO2 Levels",
+        "label": "ppm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "1000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 910,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "a8493602efd0ed1f",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Get CO2",
+        "func": "msg.payload = Math.floor(msg.payload.co2);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 500,
+        "wires": [
+            [
+                "7ca0f345dcf9c350"
+            ]
+        ]
+    },
+    {
+        "id": "c34bc51215cdb9b6",
+        "type": "ui_text",
+        "z": "f4a08ca0aee592f2",
+        "group": "303af5db77018210",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Average Temperature",
+        "format": "{{msg.payload}} °C",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 880,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "791cf963a38e5828",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Get Temp",
+        "func": "msg.payload = msg.payload.temp.toFixed(2)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 540,
+        "wires": [
+            [
+                "c34bc51215cdb9b6"
+            ]
+        ]
+    },
+    {
+        "id": "a6d53b4616f9b5f5",
+        "type": "ui_text",
+        "z": "f4a08ca0aee592f2",
+        "group": "daa456f6a225d3b5",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Grid Load",
+        "format": "{{msg.payload.gridKW.toFixed(2)}} kW",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 920,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "ba5d932c1cc6c26e",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Filter Active Alerts",
+        "func": "let allAlerts = msg.payload;\nlet activeAlerts = [];\n\nfor (const [id, data] of Object.entries(allAlerts)) {\n    if (data.treated === false) {\n        activeAlerts.push({\n            id: id,\n            msg: data.msg,\n            type: data.type\n        });\n    }\n}\n\nmsg.payload = activeAlerts;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 820,
+        "wires": [
+            [
+                "1ca7806912271f23",
+                "4acd09912bbc9ef7"
+            ]
+        ]
+    },
+    {
+        "id": "1ca7806912271f23",
+        "type": "ui_template",
+        "z": "f4a08ca0aee592f2",
+        "group": "d7b3bc3f111624f1",
+        "name": "Active Alerts",
+        "order": 2,
+        "width": "6",
+        "height": "8",
+        "format": "\n<div ng-if=\"msg.payload.length === 0\" style=\"color: #2e7d32; font-weight: 500; display: flex; align-items: center;\">\n    <i class=\"fa fa-check-circle\" style=\"margin-right: 8px; font-size: 1.2em;\"></i>\n    All systems normal.\n</div>\n\n<div ng-repeat=\"alert in msg.payload\"\n    style=\"background-color: #fef2f2; border: 1px solid #ffcdd2; border-left: 5px solid #d32f2f; color: #b71c1c; padding: 12px 16px; margin-bottom: 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);\">\n\n    <span style=\"font-size: 14px; line-height: 1.4;\">\n        <strong style=\"color: #c62828;\">{{alert.type | uppercase}}:</strong> {{alert.msg}}\n    </span>\n\n    <md-button class=\"md-raised md-warn\" style=\"margin: 0 0 0 10px; font-weight: 600; color: white; padding: 0 12px;\"\n        ng-click=\"send({payload: alert.id})\">\n        <i class=\"fa fa-close\" style=\"margin-right: 8px; font-size: 1.2em;\"></i>\n    </md-button>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 910,
+        "y": 820,
+        "wires": [
+            [
+                "ca62e41e8b20d1c5"
+            ]
+        ]
+    },
+    {
+        "id": "ca62e41e8b20d1c5",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Mark Alert Treated",
+        "func": "let alertId = msg.payload; // e.g., \"power.gen3_failure\"\nlet state = global.get('stadiumState');\n\n// If the alert exists, mark it as treated\nif (state.alerts && state.alerts[alertId]) {\n    state.alerts[alertId].treated = true;\n    \n    // Save the updated state back to memory\n    global.set('stadiumState', state);\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1150,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dd4eed0e9ff663c4",
+        "type": "ui_chart",
+        "z": "f4a08ca0aee592f2",
+        "name": "",
+        "group": "daa456f6a225d3b5",
+        "order": 4,
+        "width": "7",
+        "height": "5",
+        "label": "Grid Load (kW)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "1000",
+        "ymax": "2500",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 900,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "39e7838f214daa94",
+        "type": "change",
+        "z": "f4a08ca0aee592f2",
+        "name": "Get Grid Load (kW)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.gridKW",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 680,
+        "wires": [
+            [
+                "a6d53b4616f9b5f5",
+                "dd4eed0e9ff663c4"
+            ]
+        ]
+    },
+    {
+        "id": "60070bd109c19496",
+        "type": "ui_text",
+        "z": "f4a08ca0aee592f2",
+        "group": "daa456f6a225d3b5",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Grid Voltage",
+        "format": "{{msg.payload.toFixed(2)}} V",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 910,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "770aca6d1dca4f4f",
+        "type": "change",
+        "z": "f4a08ca0aee592f2",
+        "name": "Get Grid Voltage (V)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.gridVoltage",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 760,
+        "wires": [
+            [
+                "60070bd109c19496"
+            ]
+        ]
+    },
+    {
+        "id": "63826227c536cbc2",
+        "type": "ui_template",
+        "z": "f4a08ca0aee592f2",
+        "group": "daa456f6a225d3b5",
+        "name": "Generators",
+        "order": 3,
+        "width": "5",
+        "height": "5",
+        "format": "<div\n    style=\"margin-top: 20px; background-color: #ffffff; height: 100%; box-sizing: border-box;\">\n\n    <h3\n        style=\"color: #222222; margin-top: 0; margin-bottom: 16px; font-family: Roboto, Arial, sans-serif; font-size: 1.25em; font-weight: 500;\">\n        Generator Fleet Status\n    </h3>\n\n    <div\n        style=\"display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eeeeee;\">\n        <div style=\"font-weight: 500; color: #444444; font-size: 15px;\">GE-01\n            <span style=\"color: #888; font-size: 0.85em; font-weight: normal;\">(500 kVA)</span></div>\n        <div style=\"display: flex; gap: 16px; align-items: center;\">\n            <span style=\"font-family: monospace; font-size: 14px; color: #666666; min-width: 60px; text-align: right;\">\n                {{msg.payload.gen1.rpm}} RPM\n            </span>\n            <span style=\"padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; min-width: 65px; text-align: center;\"\n                  ng-style=\"{'background-color': msg.payload.gen1.status === 'ACTIF' ? '#2e7d32' : (msg.payload.gen1.status === 'PANNE' ? '#d32f2f' : '#9e9e9e')}\">\n                {{msg.payload.gen1.status}}\n            </span>\n        </div>\n    </div>\n\n    <div\n        style=\"display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eeeeee;\">\n        <div style=\"font-weight: 500; color: #444444; font-size: 15px;\">GE-02\n            <span style=\"color: #888; font-size: 0.85em; font-weight: normal;\">(500 kVA)</span></div>\n        <div style=\"display: flex; gap: 16px; align-items: center;\">\n            <span style=\"font-family: monospace; font-size: 14px; color: #666666; min-width: 60px; text-align: right;\">\n                {{msg.payload.gen2.rpm}} RPM\n            </span>\n            <span style=\"padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; min-width: 65px; text-align: center;\"\n                  ng-style=\"{'background-color': msg.payload.gen2.status === 'ACTIF' ? '#2e7d32' : (msg.payload.gen2.status === 'PANNE' ? '#d32f2f' : '#9e9e9e')}\">\n                {{msg.payload.gen2.status}}\n            </span>\n        </div>\n    </div>\n\n    <div style=\"display: flex; justify-content: space-between; align-items: center; padding: 10px 0;\">\n        <div style=\"font-weight: 500; color: #444444; font-size: 15px;\">GE-03\n            <span style=\"color: #888; font-size: 0.85em; font-weight: normal;\">(250 kVA)</span></div>\n        <div style=\"display: flex; gap: 16px; align-items: center;\">\n            <span style=\"font-family: monospace; font-size: 14px; color: #666666; min-width: 60px; text-align: right;\">\n                {{msg.payload.gen3.rpm}} RPM\n            </span>\n            <span style=\"padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; color: white; min-width: 65px; text-align: center;\"\n                  ng-style=\"{'background-color': msg.payload.gen3.status === 'ACTIF' ? '#2e7d32' : (msg.payload.gen3.status === 'PANNE' ? '#d32f2f' : '#9e9e9e')}\">\n                {{msg.payload.gen3.status}}\n            </span>\n        </div>\n    </div>\n\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 910,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0db8552395f33f0b",
+        "type": "ui_toast",
+        "z": "f4a08ca0aee592f2",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "md-error-toast-theme",
+        "topic": "",
+        "name": "",
+        "x": 890,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "4acd09912bbc9ef7",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Alerts Trigger",
+        "func": "let activeAlerts = msg.payload; \n\nlet state = global.get('stadiumState');\nlet stateUpdated = false;\nlet messagesToSend = [];\n\nactiveAlerts.forEach(alert => {\n    if (state.alerts[alert.id] && state.alerts[alert.id].shown === false) {\n        \n        messagesToSend.push({ topic: alert.type.toUpperCase(), payload: alert.msg });\n        \n        // Flip the flag in the global state\n        state.alerts[alert.id].shown = true;\n        stateUpdated = true;\n    }\n});\n\nif (stateUpdated) {\n    global.set('stadiumState', state);\n}\n\nif (messagesToSend.length > 0) {\n    return [messagesToSend]; \n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 920,
+        "wires": [
+            [
+                "0db8552395f33f0b"
+            ]
+        ]
+    },
+    {
+        "id": "cf111815bbd6f7bb",
+        "type": "ui_template",
+        "z": "f4a08ca0aee592f2",
+        "group": "f1df6473aa47d9a7",
+        "name": "",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n    /* Pushes the toast down from the top edge */\n    md-toast.md-top {\n        margin-top: 30px !important;\n    }\n\n    /* Pushes the toast away from the right edge */\n    md-toast.md-right {\n        margin-right: 30px !important;\n    }\n\n    /* Pushes the toast up from the bottom edge (if you change positions later) */\n    md-toast.md-bottom {\n        margin-bottom: 30px !important;\n    }\n\n    /* Pushes the toast away from the left edge (if you change positions later) */\n    md-toast.md-left {\n        margin-left: 30px !important;\n    }\n\n    md-toast, md-toast .md-toast-content {\n        border-radius: 8px !important;\n        border: none !important; /* Kills the black border */\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; /* Adds a soft modern shadow instead */\n    }\n\n    md-toast.md-error-toast-theme .md-toast-content {\n        background-color: #d32f2f !important;\n        color: white !important;\n    }\n\n    /* Target all player groups and the ball */\n    g[id^=\"p_\"], #ball {\n        transition: transform 0.8s linear !important;\n    }\n    \n    /* Target the ball specifically if you want it to move faster/differently */\n    #ball {\n        transition: cx 0.8s linear, cy 0.8s linear !important;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "global",
+        "className": "",
+        "x": 920,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fc7e37d3365bc91a",
+        "type": "inject",
+        "z": "f4a08ca0aee592f2",
+        "name": "Every 1s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "72fad6c99e2f1e4c",
+                "9d137672a66c9486"
+            ]
+        ]
+    },
+    {
+        "id": "c125406d534852d5",
+        "type": "ui_svg_graphics",
+        "z": "f4a08ca0aee592f2",
+        "group": "f1df6473aa47d9a7",
+        "order": 2,
+        "width": "14",
+        "height": "9",
+        "svgString": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 750\" style=\"width: 100% !important; height: 100% !important;\">\n    <defs>\n        <pattern id=\"muted-dots\" x=\"0\" y=\"0\" width=\"10\" height=\"10\" patternUnits=\"userSpaceOnUse\">\n            <circle cx=\"5\" cy=\"5\" r=\"2\" style=\"fill: #334155 !important; opacity: 0.5 !important;\" />\n        </pattern>\n        <pattern id=\"active-dots\" x=\"0\" y=\"0\" width=\"10\" height=\"10\" patternUnits=\"userSpaceOnUse\">\n            <circle cx=\"5\" cy=\"5\" r=\"2.5\" style=\"fill: #38bdf8 !important;\" />\n        </pattern>\n\n        <clipPath id=\"clip-z1\">\n            <rect id=\"att_zone1\" x=\"150\" y=\"80\" width=\"0\" height=\"100\" />\n        </clipPath>\n        <clipPath id=\"clip-z2\">\n            <rect id=\"att_zone2\" x=\"790\" y=\"120\" width=\"130\" height=\"0\" />\n        </clipPath>\n        <clipPath id=\"clip-z3\">\n            <rect id=\"att_zone3\" x=\"150\" y=\"570\" width=\"0\" height=\"100\" />\n        </clipPath>\n        <clipPath id=\"clip-z4\">\n            <rect id=\"att_zone4\" x=\"80\" y=\"120\" width=\"130\" height=\"0\" />\n        </clipPath>\n\n        <filter id=\"glow\" x=\"-20%\" y=\"-20%\" width=\"140%\" height=\"140%\">\n            <feGaussianBlur stdDeviation=\"3\" result=\"blur\" />\n            <feComposite in=\"SourceGraphic\" in2=\"blur\" operator=\"over\" />\n        </filter>\n    </defs>\n\n    <path d=\"M 50 200 Q 50 50 200 50 L 800 50 Q 950 50 950 200 L 950 550 Q 950 700 800 700 L 200 700 Q 50 700 50 550 Z\"\n        style=\"fill: #1e293b !important;\" />\n\n    <g id=\"lt_zone_1\" opacity=\"1\">\n        <path d=\"M 230 180 L 770 180 L 850 80 L 150 80 Z\" style=\"fill: #0f172a !important;\" />\n        <path d=\"M 230 180 L 770 180 L 850 80 L 150 80 Z\" style=\"fill: url(#muted-dots) !important;\" />\n        <path d=\"M 230 180 L 770 180 L 850 80 L 150 80 Z\"\n            style=\"fill: url(#active-dots) !important; clip-path: url(#clip-z1) !important;\" />\n        <text x=\"500\" y=\"135\"\n            style=\"fill: #ffffff !important; font-size: 22px !important; font-weight: bold !important; text-anchor: middle !important; filter: url(#glow) !important;\">ZONE\n            1</text>\n    </g>\n\n    <g id=\"lt_zone_2\" opacity=\"1\">\n        <path d=\"M 790 200 L 920 120 L 920 630 L 790 550 Z\" style=\"fill: #0f172a !important;\" />\n        <path d=\"M 790 200 L 920 120 L 920 630 L 790 550 Z\" style=\"fill: url(#muted-dots) !important;\" />\n        <path d=\"M 790 200 L 920 120 L 920 630 L 790 550 Z\"\n            style=\"fill: url(#active-dots) !important; clip-path: url(#clip-z2) !important;\" />\n        <text x=\"850\" y=\"375\" transform=\"rotate(90 850 375)\"\n            style=\"fill: #ffffff !important; font-size: 22px !important; font-weight: bold !important; text-anchor: middle !important; filter: url(#glow) !important;\">ZONE\n            2</text>\n    </g>\n\n    <g id=\"lt_zone_3\" opacity=\"1\">\n        <path d=\"M 230 570 L 770 570 L 850 670 L 150 670 Z\" style=\"fill: #0f172a !important;\" />\n        <path d=\"M 230 570 L 770 570 L 850 670 L 150 670 Z\" style=\"fill: url(#muted-dots) !important;\" />\n        <path d=\"M 230 570 L 770 570 L 850 670 L 150 670 Z\"\n            style=\"fill: url(#active-dots) !important; clip-path: url(#clip-z3) !important;\" />\n        <text x=\"500\" y=\"625\"\n            style=\"fill: #ffffff !important; font-size: 22px !important; font-weight: bold !important; text-anchor: middle !important; filter: url(#glow) !important;\">ZONE\n            3</text>\n    </g>\n\n    <g id=\"lt_zone_4\" opacity=\"1\">\n        <path d=\"M 210 200 L 80 120 L 80 630 L 210 550 Z\" style=\"fill: #0f172a !important;\" />\n        <path d=\"M 210 200 L 80 120 L 80 630 L 210 550 Z\" style=\"fill: url(#muted-dots) !important;\" />\n        <path d=\"M 210 200 L 80 120 L 80 630 L 210 550 Z\"\n            style=\"fill: url(#active-dots) !important; clip-path: url(#clip-z4) !important;\" />\n        <text x=\"145\" y=\"375\" transform=\"rotate(-90 145 375)\"\n            style=\"fill: #ffffff !important; font-size: 22px !important; font-weight: bold !important; text-anchor: middle !important; filter: url(#glow) !important;\">ZONE\n            4</text>\n    </g>\n\n    <g>\n        <rect x=\"230\" y=\"200\" width=\"540\" height=\"350\" rx=\"10\" style=\"fill: #22c55e !important;\" />\n        <g\n            style=\"stroke: #ffffff !important; stroke-width: 2 !important; fill: none !important; opacity: 0.5 !important;\">\n            <rect x=\"250\" y=\"220\" width=\"500\" height=\"310\" />\n            <line x1=\"500\" y1=\"220\" x2=\"500\" y2=\"530\" />\n            <circle cx=\"500\" cy=\"375\" r=\"40\" />\n        </g>\n    </g>\n\n    <g transform=\"translate(350, 15)\">\n        <rect width=\"300\" height=\"55\" rx=\"5\"\n            style=\"fill: #0f172a !important; stroke: #334155 !important; stroke-width: 2 !important;\" />\n        <text x=\"150\" y=\"18\"\n            style=\"fill: #94a3b8 !important; font-size: 10px !important; font-weight: bold !important; text-anchor: middle !important; letter-spacing: 1px !important;\">TOTAL\n            ATTENDANCE</text>\n        <text id=\"total\" x=\"150\" y=\"45\"\n            style=\"fill: #ffffff !important; font-size: 26px !important; font-family: monospace !important; font-weight: bold !important; text-anchor: middle !important; filter: url(#glow) !important;\">0</text>\n    </g>\n\n    <g id=\"match_simulation\">\n        <g id=\"p_mar_1\" transform=\"translate(280, 375)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">1</text>\n        </g>\n        <g id=\"p_mar_2\" transform=\"translate(350, 280)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">2</text>\n        </g>\n        <g id=\"p_mar_3\" transform=\"translate(350, 470)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">3</text>\n        </g>\n        <g id=\"p_mar_4\" transform=\"translate(330, 330)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">4</text>\n        </g>\n        <g id=\"p_mar_5\" transform=\"translate(330, 420)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">5</text>\n        </g>\n        <g id=\"p_mar_6\" transform=\"translate(420, 375)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">6</text>\n        </g>\n        <g id=\"p_mar_7\" transform=\"translate(480, 250)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">7</text>\n        </g>\n        <g id=\"p_mar_8\" transform=\"translate(450, 430)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">8</text>\n        </g>\n        <g id=\"p_mar_9\" transform=\"translate(580, 375)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">9</text>\n        </g>\n        <g id=\"p_mar_10\" transform=\"translate(520, 320)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">10</text>\n        </g>\n        <g id=\"p_mar_11\" transform=\"translate(520, 430)\">\n            <circle r=\"8\" style=\"fill: #c1272d !important; stroke: #fff !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">11</text>\n        </g>\n\n        <g id=\"p_sen_1\" transform=\"translate(720, 375)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">1</text>\n        </g>\n        <g id=\"p_sen_2\" transform=\"translate(650, 280)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">2</text>\n        </g>\n        <g id=\"p_sen_3\" transform=\"translate(650, 470)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">3</text>\n        </g>\n        <g id=\"p_sen_4\" transform=\"translate(670, 330)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">4</text>\n        </g>\n        <g id=\"p_sen_5\" transform=\"translate(670, 420)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">5</text>\n        </g>\n        <g id=\"p_sen_6\" transform=\"translate(580, 375)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">6</text>\n        </g>\n        <g id=\"p_sen_7\" transform=\"translate(520, 250)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">7</text>\n        </g>\n        <g id=\"p_sen_8\" transform=\"translate(550, 430)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">8</text>\n        </g>\n        <g id=\"p_sen_9\" transform=\"translate(420, 375)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">9</text>\n        </g>\n        <g id=\"p_sen_10\" transform=\"translate(480, 320)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">10</text>\n        </g>\n        <g id=\"p_sen_11\" transform=\"translate(480, 430)\">\n            <circle r=\"8\" style=\"fill: #00853f !important; stroke: #fdef42 !important; stroke-width: 1.5 !important;\" />\n            <text y=\"3\"\n                style=\"fill: #fff !important; font-size: 8px !important; text-anchor: middle !important;\">11</text>\n        </g>\n\n        <circle id=\"ball\" cx=\"500\" cy=\"375\" r=\"5\"\n            style=\"fill: #fff !important; stroke: #000 !important; stroke-width: 1 !important; filter: url(#glow) !important;\" />\n    </g>\n\n    <!-- Zwa9 f tiran -->\n    <g transform=\"translate(370, 230)\">\n        <rect width=\"260\" height=\"50\" rx=\"10\"\n            style=\"fill: #000000 !important; fill-opacity: 0.8 !important; stroke: #334155 !important; stroke-width: 1 !important;\" />\n        <rect x=\"10\" y=\"15\" width=\"30\" height=\"20\" rx=\"2\" style=\"fill: #c1272d !important;\" />\n        <text x=\"25\" y=\"32\"\n            style=\"fill: #006233 !important; font-size: 14px !important; text-anchor: middle !important;\">★</text>\n        <text x=\"45\" y=\"32\"\n            style=\"fill: #ffffff !important; font-size: 18px !important; font-weight: bold !important;\">MAR</text>\n        <text x=\"130\" y=\"32\"\n            style=\"fill: #fbbf24 !important; font-size: 22px !important; font-weight: 800 !important; text-anchor: middle !important; filter: url(#glow) !important;\">3\n            - 0</text>\n        <text x=\"175\" y=\"32\"\n            style=\"fill: #ffffff !important; font-size: 18px !important; font-weight: bold !important;\">SEN</text>\n        <g transform=\"translate(220, 15)\">\n            <rect width=\"10\" height=\"20\" style=\"fill: #00853f !important;\" />\n            <rect x=\"10\" width=\"10\" height=\"20\" style=\"fill: #fdef42 !important;\" />\n            <rect x=\"20\" width=\"10\" height=\"20\" style=\"fill: #e31b23 !important;\" />\n        </g>\n    </g>\n\n    <g transform=\"translate(690, 230)\">\n        <circle cx=\"0\" cy=\"0\" r=\"6\" style=\"fill: #ef4444 !important;\">\n            <animate attributeName=\"opacity\" values=\"1;0.2;1\" dur=\"1.5s\" repeatCount=\"indefinite\" />\n        </circle>\n        <text x=\"12\" y=\"6\"\n            style=\"fill: #ffffff !important; font-size: 14px !important; font-weight: bold !important; letter-spacing: 1px !important;\">LIVE</text>\n    </g>\n\n    <g transform=\"translate(300, 490)\">\n        <rect x=\"0\" y=\"0\" width=\"400\" height=\"32\" rx=\"16\"\n            style=\"fill: #000000 !important; fill-opacity: 0.7 !important; stroke: #475569 !important; stroke-width: 1 !important;\" />\n\n        <text x=\"200\" y=\"21\"\n            style=\"fill: #ffffff !important; font-size: 14px !important; font-weight: bold !important; text-anchor: middle !important; letter-spacing: 1px !important; text-transform: uppercase !important;\">\n            Prince Moulay Abdellah Stadium - Rabat\n        </text>\n    </g>\n</svg>",
+        "clickableShapes": [],
+        "javascriptHandlers": [],
+        "smilAnimations": [],
+        "bindings": [],
+        "showCoordinates": false,
+        "autoFormatAfterEdit": false,
+        "showBrowserErrors": false,
+        "showBrowserEvents": false,
+        "enableJsDebugging": false,
+        "sendMsgWhenLoaded": false,
+        "noClickWhenDblClick": false,
+        "outputField": "payload",
+        "editorUrl": "//drawsvg.org/drawsvg.html",
+        "directory": "",
+        "panning": "disabled",
+        "zooming": "disabled",
+        "panOnlyWhenZoomed": false,
+        "doubleClickZoomEnabled": false,
+        "mouseWheelZoomEnabled": false,
+        "dblClickZoomPercentage": 150,
+        "cssString": "div.ui-svg svg{\n    color: var(--nr-dashboard-widgetColor);\n    fill: currentColor !important;\n}\ndiv.ui-svg path {\n    fill: inherit;\n}",
+        "name": "",
+        "x": 900,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "72fad6c99e2f1e4c",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Format SVG Payload",
+        "func": "let state = global.get('stadiumState');\nif (!state) return null;\n\nlet p = (z) => state.attendance[z].current / state.attendance[z].capacity;\nlet l = (z) => Math.max(0.2, state.lighting[z] / 100);\n\nmsg.payload = [\n    // Background Lighting (Brightness)\n    { command: 'set_attribute', selector: '#lt_zone_1', attributeName: 'opacity', attributeValue: l('zone1') },\n    { command: 'set_attribute', selector: '#lt_zone_2', attributeName: 'opacity', attributeValue: l('zone2') },\n    { command: 'set_attribute', selector: '#lt_zone_3', attributeName: 'opacity', attributeValue: l('zone3') },\n    { command: 'set_attribute', selector: '#lt_zone_4', attributeName: 'opacity', attributeValue: l('zone4') },\n\n    // Attendance Dots (Revealed via Clipping Masks)\n    { command: 'set_attribute', selector: '#att_zone1', attributeName: 'width',  attributeValue: Math.round(p('zone1') * 700) },\n    { command: 'set_attribute', selector: '#att_zone3', attributeName: 'width',  attributeValue: Math.round(p('zone3') * 700) },\n    { command: 'set_attribute', selector: '#att_zone2', attributeName: 'height', attributeValue: Math.round(p('zone2') * 510) },\n    { command: 'set_attribute', selector: '#att_zone4', attributeName: 'height', attributeValue: Math.round(p('zone4') * 510) },\n\n    { command: 'update_text', selector: '#total', text: state.attendance.global.toLocaleString() }\n];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 140,
+        "wires": [
+            [
+                "c125406d534852d5"
+            ]
+        ]
+    },
+    {
+        "id": "8fd8bdd38f0a3419",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Split Lightings",
+        "func": "return [\n    { payload: msg.payload.zone1 },\n    { payload: msg.payload.zone2 },\n    { payload: msg.payload.zone3 },\n    { payload: msg.payload.zone4 },\n];",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 440,
+        "wires": [
+            [
+                "4065e88f9fbb5d5a"
+            ],
+            [
+                "76656b3605e86196"
+            ],
+            [
+                "07dad0cd38c3d02d"
+            ],
+            [
+                "9b4cda9480cf8461"
+            ]
+        ]
+    },
+    {
+        "id": "b200331558811221",
+        "type": "ui_button",
+        "z": "f4a08ca0aee592f2",
+        "name": "Extinction urgence",
+        "group": "b5a39d4e0df1513c",
+        "order": 1,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "OFF",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "#e61717",
+        "className": "",
+        "icon": "",
+        "payload": "0",
+        "payloadType": "num",
+        "topic": "",
+        "topicType": "str",
+        "x": 1090,
+        "y": 320,
+        "wires": [
+            [
+                "463f4062ec75a9ff"
+            ]
+        ]
+    },
+    {
+        "id": "befb628037f41828",
+        "type": "ui_button",
+        "z": "f4a08ca0aee592f2",
+        "name": "Mode Eco",
+        "group": "b5a39d4e0df1513c",
+        "order": 2,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Éco 60%",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "#e6961a",
+        "className": "",
+        "icon": "",
+        "payload": "60",
+        "payloadType": "num",
+        "topic": "",
+        "topicType": "str",
+        "x": 1060,
+        "y": 280,
+        "wires": [
+            [
+                "463f4062ec75a9ff"
+            ]
+        ]
+    },
+    {
+        "id": "f8e3166d57755891",
+        "type": "ui_button",
+        "z": "f4a08ca0aee592f2",
+        "name": "Tout allumer",
+        "group": "b5a39d4e0df1513c",
+        "order": 3,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Match 100%",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "#00b500",
+        "className": "",
+        "icon": "",
+        "payload": "100",
+        "payloadType": "num",
+        "topic": "",
+        "topicType": "str",
+        "x": 1070,
+        "y": 240,
+        "wires": [
+            [
+                "463f4062ec75a9ff"
+            ]
+        ]
+    },
+    {
+        "id": "463f4062ec75a9ff",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Update lighting",
+        "func": "let state = global.get('stadiumState');\nlet targetLevel = msg.payload; // 100, 60, or 0\n\n// Apply to all 4 spectator zones\nstate.lighting.zone1 = targetLevel;\nstate.lighting.zone2 = targetLevel;\nstate.lighting.zone3 = targetLevel;\nstate.lighting.zone4 = targetLevel;\n\nglobal.set('stadiumState', state);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1320,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9d137672a66c9486",
+        "type": "function",
+        "z": "f4a08ca0aee592f2",
+        "name": "Match Engine",
+        "func": "// 1. Initialize fieldState (High Speed / Random Chaos Edition)\nlet fState = global.get('fieldState') || {\n    players: {},\n    ball: { x: 500, y: 375, holder: \"p_mar_10\" }\n};\n\n// 2. Playable Field Constraints\nconst field = { xMin: 250, xMax: 750, yMin: 220, yMax: 530 };\n\n// 3. FULL RANDOM INITIALIZATION\n// If fieldState is empty, scatter all 22 players anywhere on the pitch\nif (Object.keys(fState.players).length === 0) {\n    ['mar', 'sen'].forEach(team => {\n        for (let i = 1; i <= 11; i++) {\n            let id = `p_${team}_${i}`;\n            // Completely random X and Y within the lines\n            let randX = field.xMin + (Math.random() * (field.xMax - field.xMin));\n            let randY = field.yMin + (Math.random() * (field.yMax - field.yMin));\n\n            fState.players[id] = {\n                x: randX,\n                y: randY,\n                homeX: randX,\n                homeY: randY\n            };\n        }\n    });\n    fState.ball.holder = \"p_mar_10\";\n}\n\nlet commands = [];\n\n// 4. POSSESSION & HIGH-SPEED PASSING\n// 30% chance to pass every second (Double the previous speed)\nif (Math.random() < 0.30) {\n    const allIds = Object.keys(fState.players);\n    fState.ball.holder = allIds[Math.floor(Math.random() * allIds.length)];\n}\n\nlet holder = fState.players[fState.ball.holder];\nfState.ball.x = holder.x + 5;\nfState.ball.y = holder.y + 5;\n\ncommands.push({ command: 'update_attribute', selector: '#ball', attributeName: 'cx', attributeValue: Math.round(fState.ball.x) });\ncommands.push({ command: 'update_attribute', selector: '#ball', attributeName: 'cy', attributeValue: Math.round(fState.ball.y) });\n\n// 5. HIGH-SPEED ZONAL MOVEMENT\nObject.keys(fState.players).forEach(id => {\n    let p = fState.players[id];\n\n    // Players shift 25% toward the ball (Aggressive attraction)\n    let targetX = p.homeX + (fState.ball.x - 500) * 0.25;\n    let targetY = p.homeY + (fState.ball.y - 375) * 0.25;\n\n    // Movement speed multiplier (increased from 0.1 to 0.4)\n    // Plus higher random jitter (up to 12px jumps)\n    p.x += (targetX - p.x) * 0.4 * Math.random() + (Math.random() - 0.5) * 20;\n    p.y += (targetY - p.y) * 0.4 * Math.random() + (Math.random() - 0.5) * 20;\n\n    // Hard boundary enforcement\n    p.x = Math.max(field.xMin, Math.min(field.xMax, p.x));\n    p.y = Math.max(field.yMin, Math.min(field.yMax, p.y));\n\n    commands.push({\n        command: 'update_attribute',\n        selector: `#${id}`,\n        attributeName: 'transform',\n        attributeValue: `translate(${Math.round(p.x)}, ${Math.round(p.y)})`\n    });\n});\n\nglobal.set('fieldState', fState);\nmsg.payload = commands;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 180,
+        "wires": [
+            [
+                "c125406d534852d5"
+            ]
+        ]
+    },
+    {
+        "id": "7cac6c09222056b3",
+        "type": "ui_group",
+        "name": "Attendance",
+        "tab": "4e03a69916bf8cf6",
+        "order": 3,
+        "disp": false,
+        "width": "8",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b5a39d4e0df1513c",
+        "type": "ui_group",
+        "name": "Lighting",
+        "tab": "4e03a69916bf8cf6",
+        "order": 4,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "303af5db77018210",
+        "type": "ui_group",
+        "name": "Environmental",
+        "tab": "4e03a69916bf8cf6",
+        "order": 6,
+        "disp": true,
+        "width": "8",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "daa456f6a225d3b5",
+        "type": "ui_group",
+        "name": "Power Grid",
+        "tab": "4e03a69916bf8cf6",
+        "order": 5,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d7b3bc3f111624f1",
+        "type": "ui_group",
+        "name": "Active Alerts",
+        "tab": "4e03a69916bf8cf6",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f1df6473aa47d9a7",
+        "type": "ui_group",
+        "name": "Live Overview",
+        "tab": "4e03a69916bf8cf6",
+        "order": 1,
+        "disp": false,
+        "width": "14",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4e03a69916bf8cf6",
+        "type": "ui_tab",
+        "name": "Stadium",
+        "icon": "fa-futbol-o",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "0b60db6d14226621",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6",
+            "node-red-contrib-ui-svg": "2.3.3"
+        }
+    }
+]

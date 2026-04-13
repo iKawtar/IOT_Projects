@@ -1,0 +1,777 @@
+[
+    {
+        "id": "5c6d60ef12726126",
+        "type": "tab",
+        "label": "SCADA",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f40e7fed1650d6b5",
+        "type": "mqtt out",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m1/temp",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a1a05d278d4861b0",
+        "x": 940,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "9d335966f857d243",
+        "type": "mqtt out",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m2/temp",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a1a05d278d4861b0",
+        "x": 940,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "557db13d6aa004de",
+        "type": "mqtt out",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m1/vibration",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a1a05d278d4861b0",
+        "x": 950,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "6a07eeacada8bfa0",
+        "type": "mqtt out",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m2/vibration",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a1a05d278d4861b0",
+        "x": 950,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "1a67307ea872087d",
+        "type": "mqtt out",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/ambiance/humidite",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a1a05d278d4861b0",
+        "x": 970,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "1310066f8c62f81b",
+        "type": "mqtt out",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/convoyeur/vitesse",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a1a05d278d4861b0",
+        "x": 970,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "3cb317e029316055",
+        "type": "mqtt in",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m1/temp",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a1a05d278d4861b0",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 280,
+        "y": 480,
+        "wires": [
+            [
+                "8d66308c1f3a50ef",
+                "f7f49f350dc6973a"
+            ]
+        ]
+    },
+    {
+        "id": "d26bcdf0ca15cb7e",
+        "type": "mqtt in",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m2/temp",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a1a05d278d4861b0",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 280,
+        "y": 540,
+        "wires": [
+            [
+                "8d66308c1f3a50ef",
+                "23af900a6c334a14"
+            ]
+        ]
+    },
+    {
+        "id": "9f1610af04c56cf5",
+        "type": "mqtt in",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/ambiance/humidite",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a1a05d278d4861b0",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 310,
+        "y": 600,
+        "wires": [
+            [
+                "8d66308c1f3a50ef",
+                "6a3c925c099b8b03"
+            ]
+        ]
+    },
+    {
+        "id": "a7c9f8ed7508263b",
+        "type": "mqtt in",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m1/vibration",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a1a05d278d4861b0",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 290,
+        "y": 660,
+        "wires": [
+            [
+                "8d66308c1f3a50ef"
+            ]
+        ]
+    },
+    {
+        "id": "3563f61d7b8f751e",
+        "type": "mqtt in",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/m2/vibration",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a1a05d278d4861b0",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 290,
+        "y": 720,
+        "wires": [
+            [
+                "8d66308c1f3a50ef"
+            ]
+        ]
+    },
+    {
+        "id": "9ec7cbf2d9bb483b",
+        "type": "mqtt in",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "topic": "atelier/convoyeur/vitesse",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a1a05d278d4861b0",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 310,
+        "y": 780,
+        "wires": [
+            [
+                "8d66308c1f3a50ef"
+            ]
+        ]
+    },
+    {
+        "id": "f7f49f350dc6973a",
+        "type": "ui_gauge",
+        "z": "5c6d60ef12726126",
+        "name": "Jauge Temp M1",
+        "group": "b3d10e5083fe7147",
+        "order": 2,
+        "width": 4,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Moteur M1",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "50",
+        "seg2": "80",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "23af900a6c334a14",
+        "type": "ui_gauge",
+        "z": "5c6d60ef12726126",
+        "name": "Jauge Temp M2",
+        "group": "b3d10e5083fe7147",
+        "order": 3,
+        "width": 4,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Moteur M2",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "50",
+        "seg2": "80",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "6a3c925c099b8b03",
+        "type": "ui_gauge",
+        "z": "5c6d60ef12726126",
+        "name": "Jauge Humidité",
+        "group": "b3d10e5083fe7147",
+        "order": 4,
+        "width": 4,
+        "height": 5,
+        "gtype": "donut",
+        "title": "Humidité Ambiante Relative",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#3498db",
+            "#2980b9",
+            "#2c3e50"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 800,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "8d66308c1f3a50ef",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Update Context",
+        "func": "var t = msg.topic;\nvar v = parseFloat(msg.payload);\n\nif (t === 'atelier/m1/temp') flow.set('m1_temp', v);\nif (t === 'atelier/m2/temp') flow.set('m2_temp', v);\nif (t === 'atelier/m1/vibration') flow.set('m1_vib', v);\nif (t === 'atelier/m2/vibration') flow.set('m2_vib', v);\nif (t === 'atelier/ambiance/humidite') flow.set('humidite', v);\nif (t === 'atelier/convoyeur/vitesse') flow.set('conv_speed', v);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 640,
+        "wires": [
+            [
+                "2a40f89a947c2d3e"
+            ]
+        ]
+    },
+    {
+        "id": "2a40f89a947c2d3e",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Constructeur SVG SCADA",
+        "func": "function color(t) {\n    if (t < 50) return '#27ae60';\n    if (t < 80) return '#e67e22';\n    return '#e74c3c';\n}\n\nvar m1t = flow.get('m1_temp') || 0;\nvar m2t = flow.get('m2_temp') || 0;\nvar m1v = flow.get('m1_vib') || 0;\nvar m2v = flow.get('m2_vib') || 0;\nvar hum = flow.get('humidite') || 0;\nvar spd = flow.get('conv_speed') || 0;\n\nmsg.m1_temp = m1t;\nmsg.m1_color = color(m1t);\nmsg.m1_vib = m1v;\nmsg.m2_temp = m2t;\nmsg.m2_color = color(m2t);\nmsg.m2_vib = m2v;\nmsg.conv_speed = spd;\nmsg.conv_active = (spd > 0);\nmsg.humidite = hum;\nmsg.alerte = (m1t >= 80 || m2t >= 80 || m1v >= 4 || m2v >= 4);\nmsg.sys_status = msg.alerte ? 'ALARME SYSTEME' : 'SYSTEME NORMAL';\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 640,
+        "wires": [
+            [
+                "c9a34516f0dfc9a1",
+                "3865e0b351473296"
+            ]
+        ]
+    },
+    {
+        "id": "c9a34516f0dfc9a1",
+        "type": "ui_template",
+        "z": "5c6d60ef12726126",
+        "group": "b3d10e5083fe7147",
+        "name": "SVG SCADA Atelier",
+        "order": 1,
+        "width": 12,
+        "height": 9,
+        "format": "<style>\n  @keyframes blink { 50% { opacity: 0.08; } }\n  @keyframes move  { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }\n  .alerte-blink { animation: blink 0.55s step-start infinite; }\n  .conv-anim    { animation: move 1s linear infinite; }\n</style>\n<div style=\"background:#0d1117; padding:16px; border-radius:10px; font-family:monospace; color:#eee;\">\n  <div style=\"display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #30363d;\">\n    <span style=\"font-size:14px; font-weight:bold; color:#58a6ff;\">SCADA — ATELIER DE PRODUCTION</span>\n    <span style=\"font-size:12px; padding:4px 12px; border-radius:5px; font-weight:bold;\" ng-style=\"{'background': msg.alerte ? '#e74c3c' : '#27ae60', 'color': 'white'}\">{{msg.sys_status}}</span>\n  </div>\n  <svg width=\"100%\" viewBox=\"0 0 500 235\">\n    <rect x=\"8\" y=\"0\" width=\"100\" height=\"30\" rx=\"5\" fill=\"#1e272e\" stroke=\"#3498db\" stroke-width=\"1\"/>\n    <text x=\"58\" y=\"19\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"12\" font-weight=\"bold\" fill=\"#3498db\">HUM: {{msg.humidite}}%</text>\n    <g ng-class=\"{'alerte-blink': msg.m1_temp >= 80 || msg.m1_vib >= 4}\">\n      <rect x=\"8\" y=\"50\" width=\"132\" height=\"125\" rx=\"8\" style=\"fill:{{msg.m1_color}}; stroke:#2c3e50; stroke-width:2.5;\"/>\n    </g>\n    <rect x=\"18\" y=\"65\" width=\"62\" height=\"52\" rx=\"4\" fill=\"rgba(0,0,0,0.3)\"/>\n    <text x=\"74\" y=\"92\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"10\" font-weight=\"bold\" fill=\"white\">MOTEUR M1</text>\n    <text x=\"74\" y=\"120\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"26\" font-weight=\"bold\" fill=\"white\">{{msg.m1_temp}}</text>\n    <text x=\"74\" y=\"136\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"11\" fill=\"rgba(255,255,255,0.9)\">°C</text>\n    <rect x=\"20\" y=\"145\" width=\"108\" height=\"20\" rx=\"3\" fill=\"rgba(0,0,0,0.5)\"/>\n    <text x=\"74\" y=\"158\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"10\" fill=\"#f1c40f\">Vib: {{msg.m1_vib}} mm/s</text>\n    <rect x=\"140\" y=\"88\" width=\"220\" height=\"34\" rx=\"5\" fill=\"#1e272e\" stroke=\"#34495e\" stroke-width=\"1\"/>\n    <line x1=\"153\" y1=\"105\" x2=\"347\" y2=\"105\" stroke=\"#7f8c8d\" stroke-width=\"10\" stroke-dasharray=\"18 10\" ng-class=\"{'conv-anim': msg.conv_active}\"/>\n    <text x=\"250\" y=\"79\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"9\" fill=\"#8b949e\">CONVOYEUR PRINCIPAL</text>\n    <text x=\"250\" y=\"148\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"15\" font-weight=\"bold\" fill=\"white\">{{msg.conv_speed}} m/min</text>\n    <g ng-class=\"{'alerte-blink': msg.m2_temp >= 80 || msg.m2_vib >= 4}\">\n      <rect x=\"360\" y=\"50\" width=\"132\" height=\"125\" rx=\"8\" style=\"fill:{{msg.m2_color}}; stroke:#2c3e50; stroke-width:2.5;\"/>\n    </g>\n    <rect x=\"370\" y=\"65\" width=\"62\" height=\"52\" rx=\"4\" fill=\"rgba(0,0,0,0.3)\"/>\n    <text x=\"426\" y=\"92\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"10\" font-weight=\"bold\" fill=\"white\">MOTEUR M2</text>\n    <text x=\"426\" y=\"120\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"26\" font-weight=\"bold\" fill=\"white\">{{msg.m2_temp}}</text>\n    <text x=\"426\" y=\"136\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"11\" fill=\"rgba(255,255,255,0.9)\">°C</text>\n    <rect x=\"372\" y=\"145\" width=\"108\" height=\"20\" rx=\"3\" fill=\"rgba(0,0,0,0.5)\"/>\n    <text x=\"426\" y=\"158\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"10\" fill=\"#f1c40f\">Vib: {{msg.m2_vib}} mm/s</text>\n  </svg>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 1180,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4737b7da0af546b9",
+        "type": "http request",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1170,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3865e0b351473296",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Send to ThingSpeak",
+        "func": "var apiKey = \"GGSBXXG21LXLG10Y\";  \n\nvar url = \"https://api.thingspeak.com/update?api_key=\" + apiKey +\n\"&field1=\" + msg.m1_temp +\n\"&field2=\" + msg.m2_temp +\n\"&field3=\" + msg.m1_vib +\n\"&field4=\" + msg.m2_vib +\n\"&field5=\" + msg.humidite +\n\"&field6=\" + msg.conv_speed;\n\nmsg.url = url;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 660,
+        "wires": [
+            [
+                "4737b7da0af546b9"
+            ]
+        ]
+    },
+    {
+        "id": "59e06f0289a63fee",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Simulate industrial data",
+        "func": "// RÉCUPÉRATION DES ÉTATS \nvar temp1 = flow.get('temp1') || 50;\nvar temp2 = flow.get('temp2') || 48;\nvar vibration1 = flow.get('vibration1') || 1.2;\nvar vibration2 = flow.get('vibration2') || 1.0;\nvar humidity = flow.get('humidity') || 45;\nvar speed = flow.get('speed') || 8;\nvar stress = flow.get('stress') || 0;\n\n// LOGIQUE DE SIMULATION\n\nstress += 0.01;\nif (stress > 5) stress = 5;\n\n// 2. Températures avec système de refroidissement (Loi de Newton)\n// On ajoute de la chaleur (stress) mais on en perd selon la température actuelle\nlet ambient = 25;\n\n// Moteur 1 : Monte vers ~75°C\ntemp1 += (0.5 + stress * 0.8) - ((temp1 - ambient) * 0.05) + (Math.random() - 0.5);\n\n// Moteur 2 : Plus stable, monte vers ~60°C\ntemp2 += (0.3 + stress * 0.6) - ((temp2 - ambient) * 0.04) + (Math.random() - 0.5);\n\n// 3. Vibrations liées à la vitesse et au stress\nvibration1 = 1.0 + (stress * 0.4) + (speed * 0.1) + (Math.random() - 0.5) * 0.2;\nvibration2 = 0.8 + (stress * 0.3) + (speed * 0.12) + (Math.random() - 0.5) * 0.2;\n\n// 4. Humidité (oscillation naturelle)\nhumidity = 50 + Math.sin(Date.now() / 10000) * 5 + (Math.random() - 0.5);\n\n// 5. Gestion de la Panne \nvar failure = (temp1 > 85 || vibration1 > 6.0 || temp2 > 85 || vibration2 > 6.0);\n\nif (failure) {\n    speed = Math.max(0, speed - 0.5); // Ralentissement progressif\n} else {\n    // Vitesse de croisière cible de 10 m/min avec légère variation\n    let targetSpeed = 10;\n    speed += (targetSpeed - speed) * 0.1 + (Math.random() - 0.5) * 0.2;\n}\n\n// ARRONDIS ET LIMITES\ntemp1 = Math.round(Math.min(Math.max(temp1, 20), 110));\ntemp2 = Math.round(Math.min(Math.max(temp2, 20), 110));\n\nvibration1 = Math.round(Math.min(Math.max(vibration1, 0), 10) * 10) / 10;\nvibration2 = Math.round(Math.min(Math.max(vibration2, 0), 10) * 10) / 10;\n\nhumidity = Math.round(Math.min(Math.max(humidity, 0), 100));\nspeed = Math.round(Math.min(Math.max(speed, 0), 15) * 10) / 10;\n\n// SAUVEGARDE ET ENVOI\nflow.set('temp1', temp1);\nflow.set('temp2', temp2);\nflow.set('vibration1', vibration1);\nflow.set('vibration2', vibration2);\nflow.set('humidity', humidity);\nflow.set('speed', speed);\n\nmsg.payload = {\n    temp1: temp1,\n    temp2: temp2,\n    vibration1: vibration1,\n    vibration2: vibration2,\n    humidity: humidity,\n    speed: speed,\n    failure: failure\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 320,
+        "wires": [
+            [
+                "faf46e3e4cab5804",
+                "d2cc4d1d9db35093",
+                "91738d8aa745de4a",
+                "2de32de88ce9f15b",
+                "5492b54d24540638",
+                "4235fdf6a90a3e07",
+                "8f746e90c49f8e4e"
+            ]
+        ]
+    },
+    {
+        "id": "5e4ab89a63374735",
+        "type": "inject",
+        "z": "5c6d60ef12726126",
+        "name": "Start Simulation",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "59e06f0289a63fee"
+            ]
+        ]
+    },
+    {
+        "id": "faf46e3e4cab5804",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Temp1",
+        "func": "return [\n    { topic: \"atelier/m1/temp\", payload: msg.payload.temp1 },\n];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 100,
+        "wires": [
+            [
+                "f40e7fed1650d6b5"
+            ]
+        ]
+    },
+    {
+        "id": "d2cc4d1d9db35093",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Temp2",
+        "func": "return [\n    { topic: \"atelier/m2/temp\", payload: msg.payload.temp2 },\n];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 140,
+        "wires": [
+            [
+                "9d335966f857d243"
+            ]
+        ]
+    },
+    {
+        "id": "91738d8aa745de4a",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Vib1",
+        "func": "return [\n \n  { topic: \"atelier/m1/vibration\", payload: msg.payload.vibration1 },\n\n];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 180,
+        "wires": [
+            [
+                "557db13d6aa004de"
+            ]
+        ]
+    },
+    {
+        "id": "2de32de88ce9f15b",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Vib2",
+        "func": "return [\n \n    { topic: \"atelier/m2/vibration\", payload: msg.payload.vibration2 },\n\n];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 220,
+        "wires": [
+            [
+                "6a07eeacada8bfa0"
+            ]
+        ]
+    },
+    {
+        "id": "5492b54d24540638",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Humidité",
+        "func": "return [\n\n\n    { topic: \"atelier/ambiance/humidite\", payload: msg.payload.humidity },\n];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 260,
+        "wires": [
+            [
+                "1a67307ea872087d"
+            ]
+        ]
+    },
+    {
+        "id": "4235fdf6a90a3e07",
+        "type": "function",
+        "z": "5c6d60ef12726126",
+        "name": "Vitesse",
+        "func": "return [\n    { topic: \"atelier/convoyeur/vitesse\", payload: msg.payload.speed }\n];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 300,
+        "wires": [
+            [
+                "1310066f8c62f81b"
+            ]
+        ]
+    },
+    {
+        "id": "8f746e90c49f8e4e",
+        "type": "switch",
+        "z": "5c6d60ef12726126",
+        "name": "Failure Detection",
+        "property": "payload.failure",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 370,
+        "y": 420,
+        "wires": [
+            [
+                "7556aa81af30da7d"
+            ]
+        ]
+    },
+    {
+        "id": "cb09dddc333cfb75",
+        "type": "ui_toast",
+        "z": "5c6d60ef12726126",
+        "position": "top right",
+        "displayTime": "5",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "md-error-toast-theme",
+        "topic": "Alerte !",
+        "name": "Alert Failure ",
+        "x": 1210,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "7556aa81af30da7d",
+        "type": "rbe",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": false,
+        "property": "payload.failure",
+        "topi": "topic",
+        "x": 590,
+        "y": 360,
+        "wires": [
+            [
+                "cb09dddc333cfb75",
+                "ea484530e238ac28"
+            ]
+        ]
+    },
+    {
+        "id": "ea484530e238ac28",
+        "type": "template",
+        "z": "5c6d60ef12726126",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Une panne a été détectéé !",
+        "output": "str",
+        "x": 980,
+        "y": 380,
+        "wires": [
+            [
+                "cb09dddc333cfb75"
+            ]
+        ]
+    },
+    {
+        "id": "d335803b2ce90546",
+        "type": "ui_template",
+        "z": "5c6d60ef12726126",
+        "group": "f1df6473aa47d9a7",
+        "name": "",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n    /* Pushes the toast down from the top edge */\n    md-toast.md-top {\n        margin-top: 30px !important;\n    }\n\n    /* Pushes the toast away from the right edge */\n    md-toast.md-right {\n        margin-right: 30px !important;\n    }\n\n    /* Pushes the toast up from the bottom edge (if you change positions later) */\n    md-toast.md-bottom {\n        margin-bottom: 30px !important;\n    }\n\n    /* Pushes the toast away from the left edge (if you change positions later) */\n    md-toast.md-left {\n        margin-left: 30px !important;\n    }\n\n    md-toast, md-toast .md-toast-content {\n        border-radius: 8px !important;\n        border: none !important; /* Kills the black border */\n        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; /* Adds a soft modern shadow instead */\n    }\n\n    md-toast.md-error-toast-theme .md-toast-content {\n        background-color: #d32f2f !important;\n        color: white !important;\n    }\n\n    /* Target all player groups and the ball */\n    g[id^=\"p_\"], #ball {\n        transition: transform 0.8s linear !important;\n    }\n    \n    /* Target the ball specifically if you want it to move faster/differently */\n    #ball {\n        transition: cx 0.8s linear, cy 0.8s linear !important;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "global",
+        "className": "",
+        "x": 800,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5aecc46ee4fdb068",
+        "type": "ui_spacer",
+        "z": "5c6d60ef12726126",
+        "name": "spacer",
+        "group": "b3d10e5083fe7147",
+        "order": 5,
+        "width": 8,
+        "height": 1
+    },
+    {
+        "id": "a1a05d278d4861b0",
+        "type": "mqtt-broker",
+        "name": "Mosquitto Local",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "scada_nodered",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "b3d10e5083fe7147",
+        "type": "ui_group",
+        "name": "Tableau de Bord de Production",
+        "tab": "cde2aaf045003ad4",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f1df6473aa47d9a7",
+        "type": "ui_group",
+        "name": "Live Overview",
+        "tab": "4e03a69916bf8cf6",
+        "order": 1,
+        "disp": false,
+        "width": "14",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cde2aaf045003ad4",
+        "type": "ui_tab",
+        "name": "SCADA-Factory",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "4e03a69916bf8cf6",
+        "type": "ui_tab",
+        "name": "Stadium",
+        "icon": "fa-futbol-o",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "746e76d9024f3a5c",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
