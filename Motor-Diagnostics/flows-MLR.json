@@ -259,7 +259,7 @@
         "type": "function",
         "z": "606bad7064a4df2b",
         "name": "Neural Net Predict",
-        "func": "let model = global.get('tfMotorModel');\n\n// 2. Safety Check\nif (!model) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Model not trained yet!\" });\n    return [\n        { payload: 0 },\n        { payload: 0 },\n        { payload: \"AWAITING AI TRAINING\", color: \"#9e9e9e\" } // Gray color\n    ];\n}\n\nnode.status({ fill: \"green\", shape: \"dot\", text: \"Predicting...\" });\n\n// --- REAL-TIME PREDICTION ---\nconst inputs = msg.payload; // [temp, vib, curr, age]\n\n// Normalize\nconst liveDataNorm = [[\n    inputs[0] / 150,\n    inputs[1] / 500,\n    inputs[2] / 100,\n    inputs[3] / 50000\n]];\n\n// Convert to Tensor and Predict\nconst inputTensor = tf.tensor2d(liveDataNorm);\nconst predictionTensor = model.predict(inputTensor);\n\nlet health = predictionTensor.dataSync()[0] * 100;\n\n// Dispose tensors immediately\ninputTensor.dispose();\npredictionTensor.dispose();\n\n// --- UI Formatting ---\nhealth = Math.max(0.1, Math.min(100, health));\nlet rul = Math.round((health / 100) * 10000);\n\nlet color = \"#00e676\";\nlet status = \"OPTIMAL\";\nif (health < 40) {\n    color = \"#ff1744\";\n    status = \"CRITICAL FAILURE IMMINENT\";\n} else if (health < 75) {\n    color = \"#ff9100\";\n    status = \"MAINTENANCE REQUIRED\";\n}\n\nreturn [\n    { payload: parseFloat(health.toFixed(2)) },\n    { payload: rul },\n    { payload: status, color: color }\n];",
+        "func": "const x_train = [\n    [30, 15, 12, 500],     \n    [40, 20, 15, 1000],    \n    [45, 25, 18, 5000],    \n    [50, 30, 20, 8000],    \n    [60, 50, 30, 12000],   \n    [70, 80, 40, 15000],   \n    [75, 100, 45, 18000],  \n    [85, 150, 50, 22000],  \n    [95, 200, 60, 28000],  \n    [105, 250, 70, 32000], \n    [115, 300, 75, 38000], \n    [125, 350, 85, 42000], \n    [135, 400, 90, 45000], \n    [145, 480, 95, 48000], \n    [150, 500, 100, 50000] \n];\n\nconst y_train = [\n    [98], [95], [92], [88],\n    [82], [75], [70], [62],\n    [55], [45], [35], [25],\n    [15], [5], [0]\n];\n\nconst mlr = new MLR(x_train, y_train);\nconst x_test = msg.payload; \nconst predictions = mlr.predict([x_test]);\n\nlet health = Math.max(0.1, Math.min(100, predictions[0][0]));\nlet rul = Math.round((health / 100) * 10000);\n\nlet color = \"#00e676\"; \nlet status = \"OPTIMAL\";\n\nif (health < 40) {\n    color = \"#ff1744\";\n    status = \"CRITICAL FAILURE IMMINENT\";\n} else if (health < 75) {\n    color = \"#ff9100\";\n    status = \"MAINTENANCE REQUIRED\";\n}\n\nreturn [\n    { payload: parseFloat(health.toFixed(2)) },\n    { payload: rul },\n    { payload: status, color: color }\n];",
         "outputs": 3,
         "timeout": "",
         "noerr": 0,
@@ -267,8 +267,8 @@
         "finalize": "",
         "libs": [
             {
-                "var": "tf",
-                "module": "@tensorflow/tfjs"
+                "var": "MLR",
+                "module": "ml-regression-multivariate-linear"
             }
         ],
         "x": 770,
@@ -392,58 +392,6 @@
         ]
     },
     {
-        "id": "0129ca97dcaa9584",
-        "type": "inject",
-        "z": "606bad7064a4df2b",
-        "name": "Trigger Training",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 480,
-        "y": 80,
-        "wires": [
-            [
-                "e5358c26c9d81e64"
-            ]
-        ]
-    },
-    {
-        "id": "e5358c26c9d81e64",
-        "type": "function",
-        "z": "606bad7064a4df2b",
-        "name": "Model Trainer",
-        "func": "node.status({ fill: \"yellow\", shape: \"ring\", text: \"Training Neural Net...\" });\n\nlet model = tf.sequential();\nmodel.add(tf.layers.dense({ units: 1, inputShape: [4], activation: 'linear' }));\nmodel.compile({ optimizer: tf.train.adam(0.05), loss: 'meanSquaredError' });\n\nconst x_vals = [];\nconst y_vals = [];\n\n// Procedurally generate 50 training points\nfor (let i = 0; i < 50; i++) {\n    let step = i / 49; // Scales from 0.0 to 1.0\n\n    x_vals.push([\n        (20 + (step * 130)) / 150,    // Temp: 20 to 150\n        (10 + (step * 490)) / 500,    // Vib: 10 to 500\n        (10 + (step * 90)) / 100,     // Curr: 10 to 100\n        (0 + (step * 50000)) / 50000  // Age: 0 to 50000\n    ]);\n\n    y_vals.push([1.0 - step]);        // Target Health: 1.0 down to 0.0\n}\n\nconst x_train = tf.tensor2d(x_vals);\nconst y_train = tf.tensor2d(y_vals);\n\nmodel.fit(x_train, y_train, { epochs: 500 }).then(() => {\n    global.set('tfMotorModel', model);\n\n    x_train.dispose();\n    y_train.dispose();\n\n    node.status({ fill: \"green\", shape: \"dot\", text: \"Trained & Cached\" });\n    node.send({ payload: \"Model successfully trained with 50 points.\" });\n}).catch(err => {\n    node.error(\"Training Error: \" + err.message);\n    node.status({ fill: \"red\", shape: \"dot\", text: \"Error\" });\n});",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [
-            {
-                "var": "tf",
-                "module": "@tensorflow/tfjs"
-            }
-        ],
-        "x": 780,
-        "y": 80,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "ui_group_adv_sensors",
         "type": "ui_group",
         "name": "Live Telemetry Controls",
@@ -485,7 +433,7 @@
         "hidden": false
     },
     {
-        "id": "c25fcc63c5090369",
+        "id": "7b2f1f9bc2dd4c79",
         "type": "global-config",
         "env": [],
         "modules": {
