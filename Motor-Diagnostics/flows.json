@@ -258,14 +258,20 @@
         "id": "5514c8cc42c29c0f",
         "type": "function",
         "z": "606bad7064a4df2b",
-        "name": "Neural Net Predict (Mockup)",
-        "func": "let features = msg.payload; // [temp, vib, curr, age]\nlet temp = features[0];\nlet vib = features[1];\nlet curr = features[2];\nlet age = features[3];\n\n// Simulate non-linear feature interactions\nlet p_temp = Math.pow((temp / 150), 2) * 45;\nlet p_vib = Math.pow((vib / 500), 2) * 35;\nlet p_curr = Math.pow((curr / 100), 1.5) * 15;\nlet p_age = (age / 50000) * 10;\n\nlet health = 100 - (p_temp + p_vib + p_curr + p_age);\nhealth = Math.max(0.1, Math.min(100, health));\n\nlet rul = Math.round((health / 100) * 10000);\n\nlet color = \"#00e676\"; // Green\nlet status = \"OPTIMAL\";\nif (health < 40) {\n    color = \"#ff1744\";\n    status = \"CRITICAL FAILURE IMMINENT\";\n} else if (health < 75) {\n    color = \"#ff9100\";\n    status = \"MAINTENANCE REQUIRED\";\n}\n\nmsg.health = parseFloat(health.toFixed(2));\nmsg.rul = rul;\nmsg.color = color;\nmsg.status = status;\n\nreturn [\n    { payload: msg.health },\n    { payload: msg.rul },\n    { payload: msg.status, color: msg.color }\n];",
+        "name": "Neural Net Predict",
+        "func": "const x_train = [\n    [30, 15, 12, 500],     \n    [40, 20, 15, 1000],    \n    [45, 25, 18, 5000],    \n    [50, 30, 20, 8000],    \n    [60, 50, 30, 12000],   \n    [70, 80, 40, 15000],   \n    [75, 100, 45, 18000],  \n    [85, 150, 50, 22000],  \n    [95, 200, 60, 28000],  \n    [105, 250, 70, 32000], \n    [115, 300, 75, 38000], \n    [125, 350, 85, 42000], \n    [135, 400, 90, 45000], \n    [145, 480, 95, 48000], \n    [150, 500, 100, 50000] \n];\n\nconst y_train = [\n    [98], [95], [92], [88],\n    [82], [75], [70], [62],\n    [55], [45], [35], [25],\n    [15], [5], [0]\n];\n\nconst mlr = new MLR(x_train, y_train);\nconst x_test = msg.payload; \nconst predictions = mlr.predict([x_test]);\n\nlet health = Math.max(0.1, Math.min(100, predictions[0][0]));\nlet rul = Math.round((health / 100) * 10000);\n\nlet color = \"#00e676\"; \nlet status = \"OPTIMAL\";\n\nif (health < 40) {\n    color = \"#ff1744\";\n    status = \"CRITICAL FAILURE IMMINENT\";\n} else if (health < 75) {\n    color = \"#ff9100\";\n    status = \"MAINTENANCE REQUIRED\";\n}\n\nreturn [\n    { payload: parseFloat(health.toFixed(2)) },\n    { payload: rul },\n    { payload: status, color: color }\n];",
         "outputs": 3,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "libs": [],
-        "x": 800,
+        "libs": [
+            {
+                "var": "MLR",
+                "module": "ml-regression-multivariate-linear"
+            }
+        ],
+        "x": 770,
         "y": 260,
         "wires": [
             [
@@ -427,7 +433,7 @@
         "hidden": false
     },
     {
-        "id": "305f5e4eafbf31cc",
+        "id": "7b2f1f9bc2dd4c79",
         "type": "global-config",
         "env": [],
         "modules": {
